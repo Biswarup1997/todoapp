@@ -1,0 +1,36 @@
+name: CD Pipeline of practice application
+
+on:
+  workflow_run:
+    workflows: ["CI build Pipeline of practice application"]
+    types:
+      - completed
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+
+      - name: install vercel cli
+        run: npm install -g vercel
+          
+      - name: download_artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: upload_build
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: deploy to vercel
+        run: |
+          vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --confirm --name=practice-app
+        
+         
