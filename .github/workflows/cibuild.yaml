@@ -1,0 +1,29 @@
+name: CI Pipeline of practice application
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout_code
+        uses: actions/checkout@v4
+   
+      - name: install_dependencies
+        run: npm install
+
+      - name: list directories
+        run: ls
+
+      - name: run build
+        run: npm run build
+
+      - name: upload_product ready build files (artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: /dist
