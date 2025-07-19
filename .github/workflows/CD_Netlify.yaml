@@ -1,0 +1,36 @@
+name: CD workflow for practice application with Netlify
+
+on:
+  workflow_run:
+        workflows: ["CI build Pipeline of practice application"]
+        types:
+          - completed
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    
+
+      - name: install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+
+      - name: install netlify cli
+        run: npm install -g netlify-cli
+
+      - name: download_artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: upload_build
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: deploy to netlify
+        run: |
+          netlify deploy --prod --token ${{ secrets.NETLIFY_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }} --name=todoApp --dir=build
